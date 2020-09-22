@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#define THREAD_CNT 4
+#define BASE 10
 #define MAX_LEN 256
 #define ERROR_CODE -1
 #define SUCCESS_CODE 0
@@ -39,15 +41,15 @@ int main(int argc, char **argv){
         exit(EXIT_SUCCESS);
     }
 
-    pthread_t pid[4];
-    Context cntx[4];
+    pthread_t pid[THREAD_CNT];
+    Context cntx[THREAD_CNT];
     int ind = 1;
-    for (int i = 0; i < 4; ++i){
+    for (int i = 0; i < THREAD_CNT; ++i){
         if (ind > argc)
             exitWithFailure("main", EINVAL);
 
         errno = 0;
-        long int line_cnt = strtol(argv[ind], NULL, 10);
+        long int line_cnt = strtol(argv[ind], NULL, BASE);
         ++ind;
         if (errno != SUCCESS_CODE || line_cnt < 0)
             exitWithFailure("main", EINVAL);
@@ -55,19 +57,18 @@ int main(int argc, char **argv){
         cntx[i].line_cnt = (size_t)line_cnt;
         cntx[i].lines = argv + ind;
         ind += line_cnt;
-        
     }
 
     if (ind > argc)
         exitWithFailure("main", EINVAL);
 
-    for (int i = 0; i < 4; ++i){
+    for (int i = 0; i < THREAD_CNT; ++i){
         int err = pthread_create(&pid[i], NULL, routine, (void*)(&cntx[i]));
         if (err == ERROR_CODE)
             exitWithFailure("main", errno);
     }
 
-    for (int i = 0; i < 4; ++i){
+    for (int i = 0; i < THREAD_CNT; ++i){
         int err = pthread_join(pid[i], NULL);
         if (err == ERROR_CODE)
             exitWithFailure("main", errno);
