@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #define THREAD_CNT 4
+#define MIN_ARG_CNT 2
 #define BASE 10
 #define MAX_LEN 256
 #define ERROR_CODE -1
@@ -36,7 +37,7 @@ void *routine(void *data){
 
 int main(int argc, char **argv){
 
-    if (argc == 1){
+    if (argc < MIN_ARG_CNT){
         printf("Format: [number of lines] [lines] and so on...\n");
         exit(EXIT_SUCCESS);
     }
